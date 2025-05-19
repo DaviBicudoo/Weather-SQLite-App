@@ -9,6 +9,8 @@
             <Button x:Name="searchButton" Text="Get weather" Clicked="searchButton_Clicked" />
 
             <Label x:Name="responseLabel" />
+
+            <Button x:Name="SaveWeatherButton" Text="Save weather data" Clicked="SaveWeatherButton_Clicked"/>
         </VerticalStackLayout>
     </ScrollView>
 

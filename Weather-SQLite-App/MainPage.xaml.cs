@@ -58,5 +58,10 @@ namespace Weather_SQLite_App
                 await DisplayAlert("Error", ex.Message, "OK");
             }
         }
+
+        private void SaveWeatherButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
     }
 }
