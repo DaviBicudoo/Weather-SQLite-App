@@ -20,9 +20,9 @@ namespace Weather_SQLite_App.Helpers
         }
 
         // Create method
-        public Task<int> Create(Weather product)
+        public Task<int> Create(Weather weather)
         {
-            return _connection.InsertAsync(product);
+            return _connection.InsertAsync(weather);
         }
 
         // Delete method
