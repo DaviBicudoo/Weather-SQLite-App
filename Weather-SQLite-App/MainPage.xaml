@@ -1,17 +1,226 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Weather_SQLite_App.MainPage">
+             x:Class="Weather_SQLite_App.MainPage"
+             BackgroundColor="#F5F7FA">
 
     <ScrollView>
-        <VerticalStackLayout Padding="30, 0" Spacing="25">
-            <Entry x:Name="cityEntry" Placeholder="Ghana"/>
-            <Button x:Name="searchButton" Text="Get weather" Clicked="searchButton_Clicked" />
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-            <Label x:Name="responseLabel" />
+            <!-- Header Section -->
+            <Frame BackgroundColor="White" 
+                   CornerRadius="15" 
+                   Padding="20"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Weather Tracker" 
+                           FontSize="28" 
+                           FontAttributes="Bold" 
+                           TextColor="#2C3E50"
+                           HorizontalOptions="Center" />
 
-            <Button x:Name="SaveWeatherButton" Text="Save weather data" Clicked="SaveWeatherButton_Clicked"/>
+                    <Entry x:Name="cityEntry" 
+                           Placeholder="Enter city name (e.g., Ghana)"
+                           BackgroundColor="#F8F9FA"
+                           TextColor="#2C3E50"
+                           PlaceholderColor="#95A5A6"
+                           FontSize="16"
+                           HeightRequest="50" />
+
+                    <Button x:Name="searchButton" 
+                            Text="🌤️ Get Weather" 
+                            Clicked="searchButton_Clicked"
+                            BackgroundColor="#3498DB"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10" />
+
+                    <Label x:Name="responseLabel" 
+                           FontSize="14"
+                           TextColor="#E74C3C"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Weather Data Section -->
+            <Frame BackgroundColor="White" 
+                   CornerRadius="15" 
+                   Padding="0"
+                   HasShadow="True">
+                <VerticalStackLayout>
+
+                    <!-- Section Header -->
+                    <Grid BackgroundColor="#34495E" 
+                          Padding="15">
+                        <Label Text="📊 Weather History" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+                    </Grid>
+
+                    <!-- Data Table -->
+                    <ListView x:Name="weatherList" 
+                              ItemSelected="weatherList_ItemSelected"
+                              BackgroundColor="Transparent"
+                              SeparatorColor="#E8EBF0"
+                              RowHeight="60">
+
+                        <!-- Enhanced Header -->
+                        <ListView.Header>
+                            <Grid ColumnDefinitions="60, *, 80, 80, 80, *, 80" 
+                                  BackgroundColor="#ECF0F1" 
+                                  Padding="10, 15"
+                                  RowDefinitions="Auto">
+                                <Label Grid.Column="0" 
+                                       Text="ID" 
+                                       FontAttributes="Bold" 
+                                       FontSize="12"
+                                       TextColor="#2C3E50"
+                                       HorizontalOptions="Center" />
+                                <Label Grid.Column="1" 
+                                       Text="City" 
+                                       FontAttributes="Bold" 
+                                       FontSize="12"
+                                       TextColor="#2C3E50"
+                                       HorizontalOptions="Start" />
+                                <Label Grid.Column="2" 
+                                       Text="Long." 
+                                       FontAttributes="Bold" 
+                                       FontSize="12"
+                                       TextColor="#2C3E50"
+                                       HorizontalOptions="Center" />
+                                <Label Grid.Column="3" 
+                                       Text="Lat." 
+                                       FontAttributes="Bold" 
+                                       FontSize="12"
+                                       TextColor="#2C3E50"
+                                       HorizontalOptions="Center" />
+                                <Label Grid.Column="4" 
+                                       Text="Temp°C" 
+                                       FontAttributes="Bold" 
+                                       FontSize="12"
+                                       TextColor="#2C3E50"
+                                       HorizontalOptions="Center" />
+                                <Label Grid.Column="5" 
+                                       Text="Description" 
+                                       FontAttributes="Bold" 
+                                       FontSize="12"
+                                       TextColor="#2C3E50"
+                                       HorizontalOptions="Start" />
+                                <Label Grid.Column="6" 
+                                       Text="Status" 
+                                       FontAttributes="Bold" 
+                                       FontSize="12"
+                                       TextColor="#2C3E50"
+                                       HorizontalOptions="Center" />
+                            </Grid>
+                        </ListView.Header>
+
+                        <!-- Enhanced Item Template -->
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <ViewCell.ContextActions>
+                                        <MenuItem Text="🗑️ Remove" 
+                                                  Clicked="MenuItem_Clicked"
+                                                  IsDestructive="True"/>
+                                    </ViewCell.ContextActions>
+
+                                    <Frame BackgroundColor="White" 
+                                           Margin="5, 2" 
+                                           CornerRadius="8"
+                                           Padding="0"
+                                           HasShadow="False"
+                                           BorderColor="#E8EBF0">
+                                        <Grid ColumnDefinitions="60, *, 80, 80, 80, *, 80" 
+                                              Padding="10, 15"
+                                              RowDefinitions="Auto">
+
+                                            <Label Grid.Column="0" 
+                                                   Text="{Binding Id}" 
+                                                   FontSize="12"
+                                                   TextColor="#7F8C8D"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+
+                                            <Label Grid.Column="1" 
+                                                   Text="{Binding Name}" 
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#2C3E50"
+                                                   VerticalOptions="Center" />
+
+                                            <Label Grid.Column="2" 
+                                                   Text="{Binding Longitude, StringFormat='{0:F2}'}" 
+                                                   FontSize="11"
+                                                   TextColor="#7F8C8D"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+
+                                            <Label Grid.Column="3" 
+                                                   Text="{Binding Latitude, StringFormat='{0:F2}'}" 
+                                                   FontSize="11"
+                                                   TextColor="#7F8C8D"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+
+                                            <StackLayout Grid.Column="4" 
+                                                         HorizontalOptions="Center"
+                                                         VerticalOptions="Center">
+                                                <Label Text="{Binding Temperature, StringFormat='{0:F1}°'}" 
+                                                       FontSize="14"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#E67E22"
+                                                       HorizontalOptions="Center" />
+                                            </StackLayout>
+
+                                            <Label Grid.Column="5" 
+                                                   Text="{Binding Description}" 
+                                                   FontSize="12"
+                                                   TextColor="#34495E"
+                                                   VerticalOptions="Center"
+                                                   LineBreakMode="TailTruncation" />
+
+                                            <Frame Grid.Column="6"
+                                                   BackgroundColor="#3498DB"
+                                                   CornerRadius="10"
+                                                   Padding="8, 4"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   HasShadow="False">
+                                                <Label Text="{Binding Main}" 
+                                                       FontSize="10"
+                                                       TextColor="White"
+                                                       FontAttributes="Bold"
+                                                       HorizontalOptions="Center" />
+                                            </Frame>
+                                        </Grid>
+                                    </Frame>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <!-- Reload Button -->
+                    <Button x:Name="reloadTable" 
+                            Text="🔄 Reload Data" 
+                            Clicked="reloadTable_Clicked"
+                            BackgroundColor="#27AE60"
+                            TextColor="White"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            Margin="15"
+                            CornerRadius="8" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Footer Spacing -->
+            <BoxView HeightRequest="20" BackgroundColor="Transparent" />
+
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

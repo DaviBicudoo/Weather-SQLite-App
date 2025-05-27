@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Platform;
+﻿using System.Collections.ObjectModel;
+using Microsoft.Maui.Platform;
 using Weather_SQLite_App.Models;
 using Weather_SQLite_App.Services;
 
@@ -6,9 +7,32 @@ namespace Weather_SQLite_App
 {
     public partial class MainPage : ContentPage
     {
+        ObservableCollection<Weather> list = new ObservableCollection<Weather>();
+
         public MainPage()
         {
             InitializeComponent();
+
+            OnAppearing();
+
+            weatherList.ItemsSource = list;
+        }
+
+        protected async override void OnAppearing()
+        {
+            try
+            {
+                list.Clear(); // It clears the list view every time we go back to the window
+
+                List<Weather> temporaryList = await App.Database.GetAll();
+
+                temporaryList.ForEach(x => list.Add(x));
+
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("OPS!", ex.Message, "OK");
+            }
         }
 
         private async void searchButton_Clicked(object sender, EventArgs e)
@@ -19,11 +43,14 @@ namespace Weather_SQLite_App
                 {
                     Weather? weather = await DataService.GetWeather(cityEntry.Text);
 
+                    weather.Name = cityEntry.Text;
+
                     if (weather != null)
                     {
                         string? weatherData = "";
 
-                        weatherData = $"Latitude: {weather.Latitude}\n" +
+                        weatherData = $"Name: {weather.Name} \n" +
+                                      $"Latitude: {weather.Latitude}\n" +
                                       $"Longitude: {weather.Longitude}\n" +
                                       $"Temperature: {weather.Temperature}°C\n" +
                                       $"Max Temperature: {weather.MaxTemperature}°C\n" +
@@ -42,6 +69,8 @@ namespace Weather_SQLite_App
                             $"&metricTemp=°C&metricWind=km/h&zoom=10&overlay=wind&product=ecmwf&level=surface" +
                             $"&lat={weather.Latitude.ToString()?.Replace(",", ".")}&lon={weather.Longitude.ToString()?.Replace(",", ".")}" +
                         $"&marker=true";
+
+                        await App.Database.Create(weather);
                     }
                     else
                     {
@@ -59,9 +88,39 @@ namespace Weather_SQLite_App
             }
         }
 
-        private void SaveWeatherButton_Clicked(object sender, EventArgs e)
+        private void weatherList_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
 
+        }
+
+        private async void MenuItem_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                MenuItem? selectedMenuItem = sender as MenuItem;
+
+                Weather? weather = selectedMenuItem?.BindingContext as Weather;
+
+                bool confirm = await DisplayAlert("Warning!", $"Do you really want to exclude this product? ({weather.Description})",
+                    "Yes", "No");
+
+                if (confirm)
+                {
+                    await App.Database.Delete(weather.Id);
+                    list.Remove(weather);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("OPS!", ex.Message, "OK");
+            }
+        }
+
+        private void reloadTable_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PopAsync();
+            Navigation.PushAsync(new MainPage());
         }
     }
 }
